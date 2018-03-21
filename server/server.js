@@ -26,3 +26,4 @@ app.post('/todo', (req, res) => {
 app.listen(4000,()=>{
   console.log('Here is the satart port 4000 ');
 });
+module.exports={app}
