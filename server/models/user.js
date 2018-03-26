@@ -119,7 +119,7 @@ UserSchema.statics.findByToken = function (token) {
   try {
     decoded = jwt.verify(token, 'abc123');
   } catch (e) {
-    return Promise.reject();
+    return Promise.reject({ error: "Invalid user email and password." });
   }
 
   return User.findOne({
@@ -134,7 +134,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
 
   return User.findOne({email}).then((user) => {
     if (!user) {
-      return Promise.reject();
+      return Promise.reject({ error: "Invalid user email and password." });
     }
 
     return new Promise((resolve, reject) => {
@@ -143,7 +143,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
         if (res) {
           resolve(user);
         } else {
-          reject();
+          reject({ error: "Invalid user email and password." });
         }
       });
     });
