@@ -42,6 +42,13 @@ app.post('/user/login', (req, res) => {
     });
 });
 
+app.delete('/user/logout', authenticate, (req, res) => {
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
+});
 
 /*app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
