@@ -4,8 +4,10 @@ var {ObjectID} = require('mongodb');
 const _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
+const nodemailer = require('nodemailer');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
+var jade = require('jade');
 var app = express();
 var port=process.env.PORT || 27017;
 app.use(bodyParser.json());
@@ -20,9 +22,41 @@ app.post('/signup', (req, res) => {
     //res.send(user);
 return user.generateAuthToken();
 }).then((token)=>{
-  res.header('x-auth', token).send(user);
+  //for email send
+  nodemailer.createTestAccount((err, account) => {
+
+      let transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: {
+              user: 'sourcesoft.developer@gmail.com', // generated ethereal user
+              pass: '!!#$124><RTTq1' // generated ethereal password
+          },
+
+      });
+
+      // setup email data with unicode symbols
+      let mailOptions = {
+          from: '"Register 👻" <info@pocketwatcher.com>', // sender address
+          to: user.email, // list of receivers
+          subject: 'Register ✔', // Subject line
+          text: 'Register Message ', // plain text body
+          html: '<b>Hello user thanks for register we will touch you soon.</b>' // html body
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              return console.log(error);
+          }
+
+
+      });
+  });
+//end for send email
+  res.header('x-auth', token).send({ "message": "User register successfully.","status": "true", "response":user});
   }).catch((e) => {
-    res.status(400).send(e);
+    res.status(400).send({ "message": e.message,"status": false, "response":e});
   })
 });
 
@@ -35,12 +69,65 @@ app.post('/user/login', (req, res) => {
   //res.send(body);
   User.findByCredentials(body.email, body.password).then((user) => {
       return user.generateAuthToken().then((token) => {
-        res.header('x-auth', token).send(user);
+        res.header('x-auth', token).send({ "message": "User login successfully.","status": "true", "response":user});
+        //res.header('x-auth', token).send(user);
       });
     }).catch((e) => {
-      res.status(400).send(e);
+      res.status(400).send({ "message": "Invalid email and password.","status": false, "response":e});
     });
 });
+
+
+app.post('/user/forgot', (req, res) => {
+  var body = _.pick(req.body, ['email']);
+  //res.send(body);
+  User.findByEmail(body.email,).then((user) => {
+      return user.generateAuthToken().then((token) => {
+        //console.log(user.email);
+        nodemailer.createTestAccount((err, account) => {
+
+            let transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: 'sourcesoft.developer@gmail.com', // generated ethereal user
+                    pass: '!!#$124><RTTq1' // generated ethereal password
+                },
+
+            });
+           //var templateDir = './templates/forgot-password';
+            // setup email data with unicode symbols
+
+
+
+            let mailOptions = {
+                from: '"Reset password 👻" <info@pocketwatcher.com>', // sender address
+                to: user.email, // list of receivers
+                subject: 'Reset password ✔', // Subject line
+name:user.firstname,
+                html: `<b> hello ${user.firstname} link has been send for change password</b>` // html body
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return console.log(error);
+                }
+
+
+            });
+        });
+      //end for send email
+      res.header('x-auth', token).send({ "message": "email has been verify.Please check email of uoyr email box.","status": "true", "response":token});
+        //res.header('x-auth', token).send(user);
+      });
+    }).catch((e) => {
+      res.status(400).send({ "message": "Invalid user email which you have provide.","status": false, "response":e});
+    });
+});
+
+
+
 
 app.delete('/user/logout', authenticate, (req, res) => {
   req.user.removeToken(req.token).then(() => {

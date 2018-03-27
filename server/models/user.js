@@ -59,7 +59,8 @@ UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
-  return _.pick(userObject, ['_id', 'email','firstname','lastname','tokens']);
+  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status'
+,'tokens']);
 };
 
 UserSchema.methods.removeToken = function (token) {
@@ -79,36 +80,7 @@ UserSchema.methods.generateAuthToken = function () {
   user.tokens.push({access, token});
 
   return user.save().then(() => {
-    nodemailer.createTestAccount((err, account) => {
-
-        let transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: 'sourcesoft.developer@gmail.com', // generated ethereal user
-                pass: '!!#$124><RTTq1' // generated ethereal password
-            },
-
-        });
-
-        // setup email data with unicode symbols
-        let mailOptions = {
-            from: '"Register 👻" <info@pocketwatcher.com>', // sender address
-            to: user.email, // list of receivers
-            subject: 'Register ✔', // Subject line
-            text: 'Register Message ', // plain text body
-            html: '<b>Hello user thanks for register we will touch you soon.</b>' // html body
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-
-
-        });
-    });
+    
    return token;
   });
 };
@@ -149,7 +121,17 @@ UserSchema.statics.findByCredentials = function (email, password) {
     });
   });
 };
+UserSchema.statics.findByEmail=function(email){
+ var User=this;
+ return User.findOne({email}).then((user) => {
+   if (!user) {
+     return Promise.reject({ error: "Invalid user email." });
+   }
+   return user;
 
+ });
+
+};
 
 
 UserSchema.pre('save', function (next) {
