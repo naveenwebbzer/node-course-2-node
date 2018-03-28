@@ -7,6 +7,7 @@ var {Todo} = require('./models/todo');
 const nodemailer = require('nodemailer');
 var {User} = require('./models/user');
 var {CustomerType}=require('./models/custype');
+var {UserDetail}=require('./models/userdetails');
 var {authenticate} = require('./middleware/authenticate');
 var jade = require('jade');
 var app = express();
@@ -199,6 +200,18 @@ app.post('/user/profile', (req, res) => {
    res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
  });
 
+});
+/// user details
+app.post('/user/user_details', (req, res) => {
+  var body = _.pick(req.body, ['email','country', 'state','city','locality','flatNumber','postcode','isshipping']);
+  var user_detail = new UserDetail(body);
+
+  user_detail.save().then((user) => {
+    res.send({"message": "Address has been save sucessfully","status": true, "response":user});
+//return user.generateAuthToken();
+}).catch((e) => {
+    res.status(400).send({ "message": e.message,"status": false, "response":e});
+  })
 });
 
 
