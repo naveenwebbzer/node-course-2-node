@@ -128,22 +128,42 @@ name:user.firstname,
 });
 //
 //customer type mailOptions
-app.post('/user/cus_type', (req, res) => {
-  var body = _.pick(req.body, ['id','email', 'firstname','lastname','phone_no','cus_type','gender']);
-  //var user = new User(body);
- //console.log(body.email);
- CustomerType.find(
-   {}
- ).then((list)=>{
-   //console.log(list.length > 0);
-   if(!(list) || list.length < 1){
-    res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
-   }
+/*app.post('/user/cus_type333', (req, res) => {
+  var body = _.pick(req.body, ['cus_type']);
+  var custype = new CustomerType(body);
 
-    res.send({ "message": "record found .","status": "true", "response":list});
- }).catch((e) => {
-   res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
- });
+  custype.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+*/
+app.post('/user/cus_type', (req, res) => {
+  var body = _.pick(req.body, ['cus_type']);
+    var custype = new CustomerType(body);
+if(body.cus_type){
+  custype.save().then((doc) => {
+res.send({ "message": "recoard has been insert sucessfully.","status": true, "response":doc});
+  }, (e) => {
+    res.status(400).send({ "message": "This Customer Type already found.","status": false, "response":e});
+  });
+
+}else{
+  CustomerType.find(
+    {}
+  ).then((list)=>{
+    //console.log(list.length > 0);
+    if(!(list) || list.length < 1){
+     res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
+    }
+
+     res.send({ "message": "record found .","status": "true", "response":list});
+  }).catch((e) => {
+    res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
+  });
+}
+
 
 });
 
