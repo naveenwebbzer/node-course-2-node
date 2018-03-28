@@ -81,7 +81,7 @@ app.post('/user/login', (req, res) => {
 app.post('/user/forgot', (req, res) => {
   var body = _.pick(req.body, ['email']);
   //res.send(body);
-  User.findByEmail(body.email,).then((user) => {
+  User.findByEmail(body.email).then((user) => {
       return user.generateAuthToken().then((token) => {
         //console.log(user.email);
         nodemailer.createTestAccount((err, account) => {
@@ -126,7 +126,34 @@ name:user.firstname,
     });
 });
 
+//  edit profile
+app.post('/user/profile', (req, res) => {
+  var body = _.pick(req.body, ['id','email', 'firstname','lastname','phone_no','cus_type','gender']);
+  //var user = new User(body);
+ console.log(body.email);
+ User.findOneAndUpdate(
+   {email:body.email},{
+     $set:{
+       firstname:body.firstname,
+       lastname:body.lastname,
+       phone_no:body.phone_no,
+       cus_type:body.cus_type,
+       gender:body.gender
+       }
+    },{
+     returnOriginal:false
+   }
+ ).then((user)=>{
+   if(!(user)){
+    res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e}); 
+   }
 
+    res.send({ "message": "record hass been update sucessfully .","status": "true", "response":user});
+ }).catch((e) => {
+   res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
+ });
+
+});
 
 
 app.delete('/user/logout', authenticate, (req, res) => {

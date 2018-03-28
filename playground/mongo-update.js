@@ -17,7 +17,5 @@ db.collection('user').findOneAndUpdate(
   console.log(result);
 });
 
-
-
-  db.close();
+db.close();
 });

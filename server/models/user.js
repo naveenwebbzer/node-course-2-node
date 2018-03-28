@@ -22,13 +22,39 @@ var UserSchema=new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 1
+      minlength: 1,
+      default: "NA"
   },
   lastname:{
     type: String,
     required: true,
     trim: true,
-    minlength: 1
+    minlength: 1,
+    default: "NA"
+  },
+  phone_no:{
+     type:Number,
+     required:false,
+     trim: true,
+     minlength: 6,
+     default: 0
+
+  },
+  cus_type:{
+     type:String,
+     required:false,
+     trim: true,
+     minlength: 1,
+     default: "NA"
+
+  },
+  gender:{
+     type:String,
+     required:false,
+     trim: true,
+     minlength: 1,
+     default: "NA"
+
   },
   password:{
       type: String,
@@ -40,7 +66,9 @@ var UserSchema=new mongoose.Schema(
       type: Boolean,
       default: true,
 
+
   },
+
   date: { type: Date, default: Date.now },
   tokens:[{
   access:{
@@ -59,7 +87,7 @@ UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
-  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status'
+  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status','phone_no','gender','cus_type'
 ,'tokens']);
 };
 
@@ -80,7 +108,7 @@ UserSchema.methods.generateAuthToken = function () {
   user.tokens.push({access, token});
 
   return user.save().then(() => {
-    
+
    return token;
   });
 };
