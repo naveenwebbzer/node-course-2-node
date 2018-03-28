@@ -6,6 +6,7 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 const nodemailer = require('nodemailer');
 var {User} = require('./models/user');
+var {CustomerType}=require('./models/custype');
 var {authenticate} = require('./middleware/authenticate');
 var jade = require('jade');
 var app = express();
@@ -125,6 +126,31 @@ name:user.firstname,
       res.status(400).send({ "message": "Invalid user email which you have provide.","status": false, "response":e});
     });
 });
+//
+//customer type mailOptions
+app.post('/user/cus_type', (req, res) => {
+  var body = _.pick(req.body, ['id','email', 'firstname','lastname','phone_no','cus_type','gender']);
+  //var user = new User(body);
+ //console.log(body.email);
+ CustomerType.find(
+   {}
+ ).then((list)=>{
+   //console.log(list.length > 0);
+   if(!(list) || list.length < 1){
+    res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
+   }
+
+    res.send({ "message": "record found .","status": "true", "response":list});
+ }).catch((e) => {
+   res.status(400).send({ "message": "Recoard not found.","status": false, "response":e});
+ });
+
+});
+
+
+
+
+
 
 //  edit profile
 app.post('/user/profile', (req, res) => {
@@ -145,7 +171,7 @@ app.post('/user/profile', (req, res) => {
    }
  ).then((user)=>{
    if(!(user)){
-    res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e}); 
+    res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
    }
 
     res.send({ "message": "record hass been update sucessfully .","status": "true", "response":user});
