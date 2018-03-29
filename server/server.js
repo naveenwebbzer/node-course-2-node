@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 var {User} = require('./models/user');
 var {CustomerType}=require('./models/custype');
 var {UserDetail}=require('./models/userdetails');
+var {PlanDetail}=require('./models/plan');
 var {authenticate} = require('./middleware/authenticate');
 var jade = require('jade');
 var app = express();
@@ -212,6 +213,23 @@ app.post('/user/user_details', (req, res) => {
 }).catch((e) => {
     res.status(400).send({ "message": e.message,"status": false, "response":e});
   })
+});
+///Plan details
+app.get('/plan',(req,res)=>{
+ PlanDetail.aggregate(
+   [
+     { $sort: { "plan_id": -1 } },
+     { $group : { _id : "$plan_id", plans: { $push: "$$ROOT" } } }
+   ]
+).then((list)=>{
+  if(!(list)){
+   res.status(400).send({ "message": "No Recoard Found.","status": false, "response":e});
+  }
+
+   res.send({ "message": "Plan list  .","status": "true", "response":list});
+ },(e)=>{
+   res.status(400).send({ "message": e.message,"status": false, "response":e});
+ });
 });
 
 
