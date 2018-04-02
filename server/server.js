@@ -45,7 +45,7 @@ return user.generateAuthToken();
           to: user.email, // list of receivers
           subject: 'Register ✔', // Subject line
           text: 'Register Message ', // plain text body
-          html: '<b>Hello user thanks for register we will touch you soon.</b>' // html body
+          html: '<b>Welcome to join pocketwatcher .Please click bleow link to verify your account .</b>' // html body
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -57,7 +57,7 @@ return user.generateAuthToken();
       });
   });
 //end for send email
-  res.header('x-auth', token).send({ "message": "User register successfully.","status": "true", "response":user});
+  res.header('x-auth', token).send({ "message": "Thank you for  registeration  successfully.An email has been send  to your register email Id.  ","status": "true", "response":user});
   }).catch((e) => {
     res.status(400).send({ "message": e.message,"status": false, "response":e});
   })
@@ -121,7 +121,7 @@ name:user.firstname,
             });
         });
       //end for send email
-      res.header('x-auth', token).send({ "message": "email has been verify.Please check email of uoyr email box.","status": "true", "response":token});
+      res.header('x-auth', token).send({ "message": "A link has been sent to your registered email id.","status": "true", "response":token});
         //res.header('x-auth', token).send(user);
       });
     }).catch((e) => {
@@ -185,12 +185,12 @@ app.post('/user/profile', (req, res) => {
        firstname:body.firstname,
        lastname:body.lastname,
        phone_no:body.phone_no,
-       cus_type:body.cus_type,
+       cus_type:new ObjectID(body.cus_type),
        gender:body.gender
        }
-    },{
-     returnOriginal:false
-   }
+    },
+     {new: true}
+
  ).then((user)=>{
    if(!(user)){
     res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
@@ -206,8 +206,17 @@ app.post('/user/profile', (req, res) => {
 app.post('/user/user_details', (req, res) => {
   var body = _.pick(req.body, ['email','country', 'state','city','locality','flatNumber','postcode','isshipping']);
   var user_detail = new UserDetail(body);
-
   user_detail.save().then((user) => {
+
+
+     User.findOneAndUpdate({email: body.email}, {$set:{address:user._id}}, {new: true}, function(err, doc){
+         if(err){
+             //console.log("Something wrong when updating data!");
+         }
+
+         //console.log(doc);
+     });
+
     res.send({"message": "Address has been save sucessfully","status": true, "response":user});
 //return user.generateAuthToken();
 }).catch((e) => {

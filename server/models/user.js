@@ -40,14 +40,7 @@ var UserSchema=new mongoose.Schema(
      default: 0
 
   },
-  cus_type:{
-     type:String,
-     required:false,
-     trim: true,
-     minlength: 1,
-     default: "NA"
-
-  },
+  cus_type:[{ type: mongoose.Schema.Types.ObjectId, ref: 'CustomerType' }],
   gender:{
      type:String,
      required:false,
@@ -79,15 +72,97 @@ var UserSchema=new mongoose.Schema(
     required:true
   }
 
-  }]
+}],
+address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User_Detail' }]
 
   }
 );
+
+var UserDetailSchema=new mongoose.Schema(
+  {
+
+
+  email:{
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    default: "NA"
+  },
+  country:{
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    default: "NA"
+  },
+  state:{
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      default: "NA"
+  },
+  city:{
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    default: "NA"
+  },
+  locality:{
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    default: "NA"
+  },
+  flatNumber:{
+     type:String,
+     required:false,
+     trim: true,
+     minlength: 1,
+     default: "NA"
+
+  },
+  postcode:{
+     type:Number,
+     required:false,
+     trim: true,
+     minlength: 6,
+     default: 0
+
+  },
+  isshippingaddress:{
+     type:String,
+     required:false,
+     trim: true,
+     minlength: 1,
+     default: "NA"
+
+  },
+ date: { type: Date, default: Date.now },
+  tokens:[{
+  access:{
+   type:String,
+   required:true
+  },token:{
+    type:String,
+    required:true
+  }
+
+}],
+
+
+  }
+);
+
+var User_Detail = mongoose.model('User_Detail', UserDetailSchema);
 UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
-  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status','phone_no','gender','cus_type'
+  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status','phone_no','gender','cus_type','address',
 ,'tokens']);
 };
 
@@ -132,15 +207,16 @@ UserSchema.statics.findByToken = function (token) {
 UserSchema.statics.findByCredentials = function (email, password) {
   var User = this;
 
-  return User.findOne({email}).then((user) => {
+  return User.findOne({email}).populate('address').then((user) => {
     if (!user) {
       return Promise.reject({ error: "Invalid user email and password." });
     }
-
+ //console.log(user);
     return new Promise((resolve, reject) => {
       // Use bcrypt.compare to compare password and user.password
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
+        // console.log(user);
           resolve(user);
         } else {
           reject({ error: "Invalid user email and password." });
