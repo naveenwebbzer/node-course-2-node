@@ -178,7 +178,7 @@ res.send({ "message": "recoard has been insert sucessfully.","status": true, "re
 app.post('/user/profile', (req, res) => {
   var body = _.pick(req.body, ['id','email', 'firstname','lastname','phone_no','cus_type','gender']);
   //var user = new User(body);
- console.log(body.email);
+ //console.log(body.email);
  User.findOneAndUpdate(
    {email:body.email},{
      $set:{
@@ -206,22 +206,62 @@ app.post('/user/profile', (req, res) => {
 app.post('/user/user_details', (req, res) => {
   var body = _.pick(req.body, ['email','country', 'state','city','locality','flatNumber','postcode','isshipping']);
   var user_detail = new UserDetail(body);
-  user_detail.save().then((user) => {
+  UserDetail.findOneAndUpdate(
+    {email:body.email},{
+      $set:{
+        country:body.country,
+        state:body.state,
+        city:body.city,
+        locality:body.locality,
+        postcode:body.postcode,
+        isshipping:body.isshipping,
+        }
+     },
+      {new: true}
+
+  ).then((user)=>{
+    if(!(user)){
+     res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
+    }
+    User.findOneAndUpdate({email: body.email}, {$set:{address:user._id}}, {new: true}, function(err, doc){
+        if(err){
+            //console.log("Something wrong when updating data!");
+        }
+
+        //console.log(doc);
+    });
+     res.send({ "message": "record hass been update sucessfully .","status": "true", "response":user});
+  }).catch((e) => {
+
+    user_detail.save().then((user) => {
 
 
-     User.findOneAndUpdate({email: body.email}, {$set:{address:user._id}}, {new: true}, function(err, doc){
-         if(err){
-             //console.log("Something wrong when updating data!");
-         }
+       User.findOneAndUpdate({email: body.email}, {$set:{address:user._id}}, {new: true}, function(err, doc){
+           if(err){
+               //console.log("Something wrong when updating data!");
+           }
 
-         //console.log(doc);
-     });
+           //console.log(doc);
+       });
 
-    res.send({"message": "Address has been save sucessfully","status": true, "response":user});
-//return user.generateAuthToken();
-}).catch((e) => {
-    res.status(400).send({ "message": e.message,"status": false, "response":e});
-  })
+      res.send({"message": "Address has been save sucessfully","status": true, "response":user});
+    //return user.generateAuthToken();
+    }).catch((e) => {
+      res.status(400).send({ "message": e.message,"status": false, "response":e});
+    })
+
+
+
+    //res.status(400).send({ "message": "This is not a valid email.","status": false, "response":e});
+  });
+
+
+  //
+
+
+
+
+
 });
 ///Plan details
 app.get('/plan',(req,res)=>{
