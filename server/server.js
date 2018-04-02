@@ -229,7 +229,7 @@ app.post('/user/user_details', (req, res) => {
         }
 
         //console.log(doc);
-    });
+    })
      res.send({ "message": "record hass been update sucessfully .","status": "true", "response":user});
   }).catch((e) => {
 
