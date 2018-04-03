@@ -28,7 +28,7 @@ return user.generateAuthToken();
 }).then((token)=>{
   //for email send
 
-        var html = jade.renderFile('./template/html.jade', {username: body.firstname});
+        var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/html.jade', {username: body.firstname});
       // setup email data with unicode symbols
       let mailOptions = {
           from: '"Register 👻" <info@pocketwatcher.com>', // sender address
