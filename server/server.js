@@ -10,6 +10,7 @@ var {CustomerType}=require('./models/custype');
 var {UserDetail}=require('./models/userdetails');
 var {PlanDetail}=require('./models/plan');
 var {authenticate} = require('./middleware/authenticate');
+var {transporter} = require('./db/mailer');
 var jade = require('jade');
 var app = express();
 var port=process.env.PORT || 27017;
@@ -26,26 +27,16 @@ app.post('/signup', (req, res) => {
 return user.generateAuthToken();
 }).then((token)=>{
   //for email send
-  nodemailer.createTestAccount((err, account) => {
 
-      let transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          auth: {
-              user: 'sourcesoft.developer@gmail.com', // generated ethereal user
-              pass: '!!#$124><RTTq1' // generated ethereal password
-          },
-
-      });
-
+        var html = jade.renderFile('./template/html.jade', {username: body.firstname});
       // setup email data with unicode symbols
       let mailOptions = {
           from: '"Register 👻" <info@pocketwatcher.com>', // sender address
           to: user.email, // list of receivers
           subject: 'Register ✔', // Subject line
-          text: 'Register Message ', // plain text body
-          html: '<b>Welcome to join pocketwatcher .Please click bleow link to verify your account .</b>' // html body
+          html: html,
+          text:'text'
+         // html body
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -55,7 +46,7 @@ return user.generateAuthToken();
 
 
       });
-  });
+
 //end for send email
   res.header('x-auth', token).send({ "message": "Thank you for  registeration  successfully.An email has been send  to your register email Id.  ","status": "true", "response":user});
   }).catch((e) => {
@@ -66,6 +57,24 @@ return user.generateAuthToken();
 app.get('/user/check', authenticate, (req, res) => {
   res.send(req.user);
 });
+
+
+app.post('/user/checkemail',(req, res) => {
+var body = _.pick(req.body, ['email']);
+User.findByEmail(body.email).then((user) => {
+  if(!(user) || user.length < 1){
+   res.status(400).send({ "message": "Invalid user email which you have provide.","status": false, "response":e});
+  }
+
+    res.send({ "message": "User found sucessfully.","status": "true", "response":user});
+
+  }).catch((e) => {
+    res.status(400).send({ "message": "Invalid user email which you have provide.","status": false, "response":e});
+  });
+
+});
+
+
 
 app.post('/user/login', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
@@ -87,39 +96,29 @@ app.post('/user/forgot', (req, res) => {
   User.findByEmail(body.email).then((user) => {
       return user.generateAuthToken().then((token) => {
         //console.log(user.email);
-        nodemailer.createTestAccount((err, account) => {
 
-            let transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 587,
-                secure: false,
-                auth: {
-                    user: 'sourcesoft.developer@gmail.com', // generated ethereal user
-                    pass: '!!#$124><RTTq1' // generated ethereal password
-                },
+        var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/forgotpass.jade', {name: user.firstname});
+      // setup email data with unicode symbols
+      let mailOptions = {
+          from: '"Reset password 👻" <info@pocketwatcher.com>', // sender address
+          to: user.email, // list of receivers
+          subject: 'Reset password ✔', // Subject line
+          html: html,
+          text:'text'
+         // html body
+      };
 
-            });
-           //var templateDir = './templates/forgot-password';
-            // setup email data with unicode symbols
-
-
-
-            let mailOptions = {
-                from: '"Reset password 👻" <info@pocketwatcher.com>', // sender address
-                to: user.email, // list of receivers
-                subject: 'Reset password ✔', // Subject line
-name:user.firstname,
-                html: `<b> hello ${user.firstname} link has been send for change password</b>` // html body
-            };
-
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    return console.log(error);
-                }
+      transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              return console.log(error);
+          }
 
 
-            });
-        });
+      });
+
+
+
+
       //end for send email
       res.header('x-auth', token).send({ "message": "A link has been sent to your registered email id.","status": "true", "response":token});
         //res.header('x-auth', token).send(user);

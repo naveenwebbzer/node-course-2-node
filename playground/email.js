@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
 var jade = require('jade');
-nodemailer.createTestAccount((err, account) => {
 
-    let transporter = nodemailer.createTransport({
+
+    var transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
         secure: false, // true for 465, false for other ports
@@ -14,6 +14,8 @@ nodemailer.createTestAccount((err, account) => {
     });
 
     // setup email data with unicode symbols
+
+
 
     var html = jade.renderFile('/var/www/html/PocketWatcher/playground/html.jade', {username: 'testUsername'});
     let mailOptions = {
@@ -33,4 +35,3 @@ nodemailer.createTestAccount((err, account) => {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
     });
-});
