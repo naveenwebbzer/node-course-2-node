@@ -28,7 +28,7 @@ return user.generateAuthToken();
 }).then((token)=>{
   //for email send
 
-        var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/html.jade', {username: body.firstname});
+      //  var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/html.jade', {username: body.firstname});
       // setup email data with unicode symbols
       let mailOptions = {
           from: '"Register 👻" <info@pocketwatcher.com>', // sender address
@@ -97,13 +97,13 @@ app.post('/user/forgot', (req, res) => {
       return user.generateAuthToken().then((token) => {
         //console.log(user.email);
 
-        var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/forgotpass.jade', {name: user.firstname});
+        //var html = jade.renderFile('/var/www/html/PocketWatcher/server/template/forgotpass.jade', {name: user.firstname});
       // setup email data with unicode symbols
       let mailOptions = {
           from: '"Reset password 👻" <info@pocketwatcher.com>', // sender address
           to: user.email, // list of receivers
           subject: 'Reset password ✔', // Subject line
-          html: html,
+          html: 'A link has been send your email',
           text:'text'
          // html body
       };
