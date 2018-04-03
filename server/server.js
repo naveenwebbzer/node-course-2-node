@@ -34,7 +34,7 @@ return user.generateAuthToken();
           from: '"Register 👻" <info@pocketwatcher.com>', // sender address
           to: user.email, // list of receivers
           subject: 'Register ✔', // Subject line
-          html: html,
+          html: 'Thanku for registration',
           text:'text'
          // html body
       };
