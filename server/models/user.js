@@ -40,6 +40,14 @@ var UserSchema=new mongoose.Schema(
      default: 0
 
   },
+  profileImage:{
+    type:String,
+    required:false,
+    trim: true,
+    minlength: 1,
+    default: "NA"
+
+  },
   cus_type:[{ type: mongoose.Schema.Types.ObjectId, ref: 'CustomerType' }],
   gender:{
      type:String,
@@ -133,6 +141,7 @@ var UserDetailSchema=new mongoose.Schema(
      default: 0
 
   },
+
   isshippingaddress:{
      type:String,
      required:false,
@@ -162,7 +171,7 @@ UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
-  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status','phone_no','gender','cus_type','address',
+  return _.pick(userObject, ['_id', 'email','firstname','lastname','verify_status','phone_no','gender','cus_type','address','profileImage',
 ,'tokens']);
 };
 

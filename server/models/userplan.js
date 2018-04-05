@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
-var UserDetailSchema=new mongoose.Schema(
+var UserPlanSchema=new mongoose.Schema(
   {
 
     email: {
@@ -12,42 +12,37 @@ var UserDetailSchema=new mongoose.Schema(
       required: true,
       trim: true,
       minlength: 1,
-      unique:true,
-      validate:{
-        validator:validator.isEmail,
-        message:'{value} is not a valid email'
-
-    }
-  },
-  country:{
-    type: String,
+      unique:true
+    },
+  plan:{
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     trim: true,
     minlength: 1,
     default: "NA"
   },
-  state:{
+  plan_type:{
       type: String,
       required: true,
       trim: true,
       minlength: 1,
       default: "NA"
   },
-  city:{
+  plan_id:{
     type: String,
     required: true,
     trim: true,
     minlength: 1,
     default: "NA"
   },
-  locality:{
+  plan_name:{
     type: String,
     required: true,
     trim: true,
     minlength: 1,
     default: "NA"
   },
-  flatNumber:{
+  description:{
      type:String,
      required:false,
      trim: true,
@@ -55,15 +50,23 @@ var UserDetailSchema=new mongoose.Schema(
      default: "NA"
 
   },
-  postcode:{
-     type:Number,
+  status:{
+     type:Boolean,
      required:false,
      trim: true,
      minlength: 6,
      default: 0
 
   },
-  isshippingaddress:{
+  price:{
+     type:String,
+     required:false,
+     trim: true,
+     minlength: 1,
+     default: "NA"
+
+  },
+  plan_mode:{
      type:String,
      required:false,
      trim: true,
@@ -72,24 +75,22 @@ var UserDetailSchema=new mongoose.Schema(
 
   },
  date: { type: Date, default: Date.now },
-  tokens:[{
-  access:{
-   type:String,
-   required:true
-  },token:{
-    type:String,
-    required:true
-  }
+ paymentstatus:{
 
-  }]
+      type:Boolean,
+      required:true,
+      trim: true,
+      minlength: 6,
+      default: 0
 
-  }
+   }
+}
 );
 
+var UserPlan = mongoose.model('UserPlan', UserPlanSchema);
 
 
 
 
-var UserDetail = mongoose.model('user_details', UserDetailSchema);
 
-module.exports = {UserDetail}
+module.exports = {UserPlan}

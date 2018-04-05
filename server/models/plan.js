@@ -47,6 +47,12 @@ var PlanSchema=new mongoose.Schema(
     minlength: 1,
     default: "NA"
   },
+  plan_mode:{
+    type: String,
+      trim: true,
+    minlength: 1,
+    default: "NA"
+  },
  date: { type: Date, default: Date.now }
 
 
@@ -54,6 +60,21 @@ var PlanSchema=new mongoose.Schema(
 );
 
 
-var PlanDetail = mongoose.model('plans', PlanSchema);
 
+
+
+PlanSchema.statics.findByID=function(_id){
+ var PlanDetail=this;
+
+ 
+ return PlanDetail.findById({_id}).then((plan) => {
+   if (!plan) {
+     return Promise.reject({ error: "Invalid Plan ID." });
+   }
+   return plan;
+
+ });
+
+};
+var PlanDetail = mongoose.model('plans', PlanSchema);
 module.exports = {PlanDetail}
